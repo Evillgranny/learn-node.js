@@ -6,13 +6,13 @@
     <% } else { %>
     <p>Name</p>
     <% } %>
-    <input name="userName" type="text">
+    <input value="<%- userName %>" name="userName" type="text">
     <% if (invalidUserSurname) { %>
       <p style="color: red">Field "Surname" is required </p>
     <% } else { %>
       <p>Surname</p>
     <% } %>
-    <input name="userSurname" type="text">
+    <input value="<%- userSurname %>" name="userSurname" type="text">
     <p></p>
     <button type="submit">
         Send

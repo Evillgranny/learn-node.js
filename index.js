@@ -10,6 +10,8 @@ app.get('/form', (request,response) => {
     response.render('form', {
         invalidUserName: false,
         invalidUserSurname: false,
+        userName: '',
+        userSurname: ''
     })
 })
 
@@ -33,9 +35,13 @@ app.post('/form', urlencodedParser, (request, response) => {
         !request.body.userName ? errorUserName = true : userName = request.body.userName
         !request.body.userSurname ? errorUserSurname = true : userSurname = request.body.userSurname
 
+        console.log(userName, userSurname)
+
         response.render('form', {
             invalidUserName: errorUserName,
             invalidUserSurname: errorUserSurname,
+            userName,
+            userSurname
         })
     }
 })
