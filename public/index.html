@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Голосовалка</h1>
+    <form action="/" method="post">
+        <select name="vote" id="variants"></select>
+
+        <button type="submit">
+            Отправить
+        </button>
+    </form>
+
+    <h1>Статистика</h1>
+
+    <ul id="stat">
+
+    </ul>
+<script>
+    (async function () {
+        const variantsContainer = document.querySelector('#variants')
+        const statContainer = document.querySelector('#stat')
+        let response = await fetch('/variants');
+
+        if (response.ok) {
+            let json = await response.json();
+            for (let item in json) {
+                // Голосование
+                const currentItem = document.createElement('option')
+                currentItem.textContent = json[item].title
+                currentItem.value = item
+                variantsContainer.appendChild(currentItem)
+
+                // Статистика
+                const statItem = document.createElement('li')
+                statItem.textContent = json[item].title
+                statItem.textContent += ' ' + json[item].votes
+                statContainer.appendChild(statItem)
+            }
+        }
+    })()
+</script>
+</body>
+</html>
