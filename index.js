@@ -27,14 +27,12 @@ function logLineSync(logFilePath,logLine) {
 
 webserver.get('/variants', (req, res) => {
     logLineSync(logFN,`[${port}] `+'variants called')
-    const data = require(__dirname + '/variants.json')
-    res.send(JSON.stringify(data))
+    res.sendFile(__dirname + '/variants.json')
 })
 
 webserver.get('/stat', (req, res) => {
     logLineSync(logFN,`[${port}] `+'stat called')
-    const data = require(__dirname + '/stat.json')
-    res.send(JSON.stringify(data))
+    res.sendFile(__dirname + '/stat.json')
 })
 
 webserver.post('/stat', jsonParser, async (req, res) => {
