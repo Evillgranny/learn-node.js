@@ -7,6 +7,8 @@ const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 
 webserver.use(express.urlencoded({extended:true}))
+webserver.use(express.static(__dirname + '/public'))
+
 
 const port = 443;
 const logFN = path.join(__dirname, '_server.log')
@@ -23,23 +25,26 @@ function logLineSync(logFilePath,logLine) {
     fs.closeSync(logFd);
 }
 
-webserver.get('/', (req, res) => {
-    logLineSync(logFN,`[${port}] `+'index called');
-    res.sendFile(__dirname + "/public/index.html");
+webserver.get('/variants', (req, res) => {
+    logLineSync(logFN,`[${port}] `+'variants called')
+    const data = require(__dirname + '/variants.json')
+    res.send(JSON.stringify(data))
+})
+
+webserver.get('/stat', (req, res) => {
+    logLineSync(logFN,`[${port}] `+'stat called')
+    const data = require(__dirname + '/stat.json')
+    res.send(JSON.stringify(data))
 })
 
 webserver.post('/stat', jsonParser, async (req, res) => {
-    const file = JSON.parse(fs.readFileSync(__dirname + '/data.json', 'utf-8'))
-    console.log(file[req.body.vote].votes)
-    file[req.body.vote].votes += 1
-    await fs.writeFileSync(__dirname + '/data.json', JSON.stringify(file, null, 2))
-    res.status(200).send(200);
-})
+    let file = JSON.parse(fs.readFileSync(__dirname + '/stat.json', 'utf-8'))
+    file[req.body.vote] = Number(file[req.body.vote]) + 1
 
-webserver.get('/variants', (req, res) => {
-    logLineSync(logFN,`[${port}] `+'variants called')
-    const data = require(__dirname + '/data.json')
-    res.send(JSON.stringify(data))
+    fs.writeFile(__dirname + '/stat.json', JSON.stringify(file, null, 2), (error) => {
+        if(error) throw error;
+        res.status(200).send(200)
+    })
 })
 
 webserver.listen(port,()=>{
