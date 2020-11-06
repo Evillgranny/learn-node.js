@@ -1,13 +1,15 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const webserver = express();
+const express = require('express')
+const fs = require('fs')
+const path = require('path')
+const os = require('os')
+const webserver = express()
+const bodyParser = require('body-parser')
+const jsonParser = bodyParser.json()
 
-webserver.use(express.urlencoded({extended:true}));
+webserver.use(express.urlencoded({extended:true}))
 
 const port = 443;
-const logFN = path.join(__dirname, '_server.log');
+const logFN = path.join(__dirname, '_server.log')
 
 function logLineSync(logFilePath,logLine) {
     const logDT=new Date();
@@ -24,13 +26,14 @@ function logLineSync(logFilePath,logLine) {
 webserver.get('/', (req, res) => {
     logLineSync(logFN,`[${port}] `+'index called');
     res.sendFile(__dirname + "/public/index.html");
-});
+})
 
-webserver.post('/', async (req, res) => {
+webserver.post('/stat', jsonParser, async (req, res) => {
     const file = JSON.parse(fs.readFileSync(__dirname + '/data.json', 'utf-8'))
+    console.log(file[req.body.vote].votes)
     file[req.body.vote].votes += 1
     await fs.writeFileSync(__dirname + '/data.json', JSON.stringify(file, null, 2))
-    await res.sendFile(__dirname + "/public/index.html");
+    res.status(200).send(200);
 })
 
 webserver.get('/variants', (req, res) => {
