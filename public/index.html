@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div>
+        <select id="sendMethod">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+        </select>
+        <input id="url" placeholder="URL" type="text">
+
+        <button id="submitBtn">
+            send
+        </button>
+
+        <h2>Params</h2>
+
+        <div class="query-container">
+            <div class="query-block">
+                <input placeholder="key" class="query-key" type="text">
+                <input placeholder="value" class="query-value" type="text">
+            </div>
+
+            <div class="query-block">
+                <input placeholder="key" class="query-key" type="text">
+                <input placeholder="value" class="query-value" type="text">
+            </div>
+
+            <div class="query-block">
+                <input placeholder="key" class="query-key" type="text">
+                <input placeholder="value" class="query-value" type="text">
+            </div>
+        </div>
+
+        <h2>Content type</h2>
+
+        <div>
+            <label>
+                <input class="content-type" type="radio" value="none" name="content-type" checked>
+                <span>none</span>
+            </label>
+            <label>
+                <input class="content-type" type="radio" value="application/x-www-form-urlencoded" name="content-type" >
+                <span>application/x-www-form-urlencoded</span>
+            </label>
+            <label>
+                <input class="content-type" type="radio" value="form-data" name="content-type" >
+                <span>form-data</span>
+            </label>
+        </div>
+
+        <h2>body</h2>
+
+        <div class="body-container">
+            <div class="body-block">
+                <input placeholder="key" class="body-key" type="text">
+                <input placeholder="value" class="body-value" type="text">
+            </div>
+
+            <div class="body-block">
+                <input placeholder="key" class="body-key" type="text">
+                <input placeholder="value" class="body-value" type="text">
+            </div>
+
+            <div class="body-block">
+                <input placeholder="key" class="body-key" type="text">
+                <input placeholder="value" class="body-value" type="text">
+            </div>
+        </div>
+
+        <h2>Headers</h2>
+
+        <div class="other-headers-container">
+            <div class="other-headers-block">
+                <input placeholder="key" class="other-headers-key" type="text">
+                <input placeholder="value" class="other-headers-value" type="text">
+            </div>
+
+            <div class="other-headers-block">
+                <input placeholder="key" class="other-headers-key" type="text">
+                <input placeholder="value" class="other-headers-value" type="text">
+            </div>
+
+            <div class="other-headers-block">
+                <input placeholder="key" class="other-headers-key" type="text">
+                <input placeholder="value" class="other-headers-value" type="text">
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
