@@ -1,52 +1,53 @@
-const express = require("express")
-const bodyParser = require("body-parser")
+const express = require('express');
+const expressLayouts = require('express-ejs-layouts')
+const bodyParser = require('body-parser')
+const { check, validationResult } = require('express-validator')
 
-const app = express()
-app.set('view engine', 'ejs')
+const webserver = express();
 
-const urlencodedParser = bodyParser.urlencoded({extended: false})
+webserver.use(bodyParser.json());
+webserver.use(bodyParser.urlencoded({ extended: false }));
 
-app.get('/form', (request,response) => {
-    response.render('form', {
-        invalidUserName: false,
-        invalidUserSurname: false,
-        userName: '',
-        userSurname: ''
+webserver.use(expressLayouts)
+webserver.set('layout', './layouts/default')
+webserver.set('view engine', 'ejs')
+
+
+webserver.use(express.static('public'))
+webserver.use('/js', express.static(`${__dirname}/public/js`))
+
+webserver.get('/', (req,res) => {
+    res.render('index', {
+        title: 'login'
     })
 })
 
-app.post('/form', urlencodedParser, (request, response) => {
-    let invalid = false
-    for (let i in request.body) {
-        request.body[i].length === 0 ? invalid = true : false
-    }
+webserver.get('/personal-account', (req, res) => {
+    res.render('personal-account', {
+        title: 'Personal account',
+        username: req.query.username
+    })
+})
 
-    if (!invalid) {
-        response.render('success-form', {
-            userName: request.body.userName,
-            userSurname: request.body.userSurname
+webserver.post('/form', [
+    check('login', 'This username must me 3+ characters long')
+        .exists()
+        .isLength({ min: 3 })
+], (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        const alert = errors.array()
+        res.render('index', {
+            alert,
+            title: 'login'
         })
     } else {
-        let errorUserName = false,
-            errorUserSurname = false,
-            userName = '',
-            userSurname = ''
-
-        !request.body.userName ? errorUserName = true : userName = request.body.userName
-        !request.body.userSurname ? errorUserSurname = true : userSurname = request.body.userSurname
-
-        console.log(userName, userSurname)
-
-        response.render('form', {
-            invalidUserName: errorUserName,
-            invalidUserSurname: errorUserSurname,
-            userName,
-            userSurname
-        })
+        res.redirect('/personal-account?username=' + req.body.login, 302)
     }
 })
 
-app.listen(443, () => {
-    console.log('Server is running...')
-})
+const port = 443;
 
+webserver.listen(port,() => {
+    console.log('Server start in port ' + port)
+});

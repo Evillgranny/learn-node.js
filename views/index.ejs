@@ -1,0 +1,18 @@
+<% if(typeof alert != 'undefined') { %>
+    <% alert.forEach(function(error) { %>
+        <h2 style="color: red;">
+            <%= error.msg %>
+        </h2>
+    <% }) %>
+<% } %>
+
+<form action="/form" method="post">
+    <input name="login" type="text" placeholder="login">
+
+    <input name="password" type="password" placeholder="password">
+
+    <button type="submit">
+        send
+    </button>
+</form>
+
