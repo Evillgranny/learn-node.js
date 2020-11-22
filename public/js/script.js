@@ -1,6 +1,5 @@
 async function newRequest (sendMethod, url, paramsStr, contentType, bodyContent, otherHeadersContent) {
-    console.log(sendMethod, url, paramsStr, contentType, bodyContent, otherHeadersContent)
-    let body = JSON.stringify({
+    const body = JSON.stringify({
         method: sendMethod,
             url: url,
             query: paramsStr,
@@ -11,16 +10,22 @@ async function newRequest (sendMethod, url, paramsStr, contentType, bodyContent,
     let response = await fetch('/postman', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-type': 'application/json',
         },
         body
     })
+    const json = await response.json()
+    console.log(json)
+
+    document.querySelector('#result').textContent = json.body
+    document.querySelector('#headerResult').textContent = JSON.stringify(json.headers)
+    document.querySelector('#contentType').textContent = json.headers['content-type']
+    document.querySelector('#resStatus').textContent = json.status
 }
 
 window.onload = function () {
     const submitBtn = document.querySelector('#submitBtn')
-
-    submitBtn.addEventListener('click', function () {
+    submitBtn.addEventListener('click', async function () {
         const sendMethod = document.querySelector('#sendMethod').value
         const url = document.querySelector('#url').value
         const paramsContainer = document.querySelector('.query-container')
@@ -34,7 +39,7 @@ window.onload = function () {
         queries.forEach(function (i) {
             const key = i.querySelector('.query-key').value
             const value = i.querySelector('.query-value').value
-            if (!queryStr) queryStr += '?'
+            if (!queryStr && key) queryStr += '?'
 
             if (key) {
                 if (queryStr === '?') {

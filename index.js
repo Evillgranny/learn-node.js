@@ -1,38 +1,62 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser')
-const jsonParser = bodyParser.json()
 const fetch = require("node-fetch");
+
 
 const webserver = express();
 webserver.use(express.static(__dirname + '/public'))
+webserver.use(bodyParser.json());
+webserver.use(bodyParser.urlencoded({ extended: false }));
 
-webserver.post('/postman', jsonParser, (req, res) => {
+webserver.post('/postman', (req, res) => {
+    let result = {}
     if (req.body.method === 'GET') {
-        let contentType = null
-        let headers = null
-
-        req.body.contentType ? contentType = req.body.ContentType : false
-        req.body.headers ? headers = req.body.headers : false
-
-        console.log(req.body.url + req.body.query)
-        fetch(`${req.body.url + req.body.query}`, {
-            method: 'GET',
+        fetch(req.body.url + req.body.query, {
             headers: {
-                ...contentType,
-                ...headers
+                ...req.body.headers,
+                ...req.body.contentType,
             }
         })
-            .then(res => console.log(res))
-            .catch(err => console.log(err))
-    } else {
-        console.log('post')
+            .then(async res =>  {
+                result.status = res.status
+                result.headers = res.headers.raw()
+                result.body = await res.text().then(res => res)
+            })
+            .then(() => {
+                console.log('Postman called, method get')
+                res.send(result)
+            })
+            .catch(e => {
+                console.log(e)
+            })
+    } else if (req.body.method === 'POST') {
+        fetch(req.body.url + req.body.query, {
+            method: 'POST',
+            headers: {
+                ...req.body.headers,
+                ...req.body.contentType,
+            },
+            body: {
+                ...req.body.body
+            }
+        })
+            .then(async res =>  {
+                result.status = res.status
+                result.headers = res.headers.raw()
+                result.body = await res.text().then(res => res)
+            })
+            .then(() => {
+                console.log('Postman called, method post')
+                res.send(result)
+            })
+            .catch(e => {
+                console.log(e)
+            })
     }
-    res.send('=)')
 })
-
 const port = 443;
 
-webserver.listen(port,()=>{
+webserver.listen(port,() => {
     console.log('Server start in port ' + port)
 });
