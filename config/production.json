@@ -1,0 +1,6 @@
+{
+  "port": 5000,
+  "jwtSecret": "Mark app mern",
+  "mongoUri": "mongodb+srv://mark:Naruto228@cluster0.2nkhi.mongodb.net/app?retryWrites=true&w=majority",
+  "baseUrl": "http://localhost:5000"
+}
