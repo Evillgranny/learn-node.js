@@ -1,0 +1,55 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Socket.io-file 2.x File Upload Example</title>
+    <style>
+        .progress {
+            width: 310px;
+            height: 5px;
+            border: 1px solid black;
+            position: relative;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .progress-in {
+            position: absolute;
+            width: 0;
+            height: 100%;
+            background: aqua;
+        }
+    </style>
+</head>
+<body>
+<h1>File storage</h1>
+
+    <form id="form">
+        <input type="file" id="file" multiple />
+        <input id="comment"  type="text" name="comment" placeholder="comment">
+        <input type="submit" value="Upload" />
+    </form>
+
+    <div class="progress">
+        <div class="progress-in"></div>
+    </div>
+
+    <h2 id="info" class="info"></h2>
+
+    <h2>File list</h2>
+
+    <ul>
+        <% Object.keys(JSON.parse(file)).forEach(key =>  { %>
+        <li>
+            <a download="data<%= key %>" href="/data/<%= key %>">
+                <%= key %> <br>
+                <%= JSON.parse(file)[key] %>
+            </a>
+        </li>
+        <% }) %>
+    </ul>
+    <script src="socket.io.js"></script>
+    <script src="socket.io-file-client.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
