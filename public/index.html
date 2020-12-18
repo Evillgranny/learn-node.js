@@ -1,0 +1,26 @@
+<doctype html/>
+
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>FileStorage</title>
+
+        <link rel="stylesheet" href="stylesheets/style.css">
+
+    </head>
+
+    <body>
+    <form enctype="multipart/form-data" method="post" name="fileInfo">
+        <div class="section"><label ><span class="label">Выберите файл:</span> <input type="file" name="file"></label></div>
+        <div class="section"><label ><span class="label">Комментарий</span> <textarea class="textarea" name="comment"></textarea></label></div>
+        <div class="section"><button type="submit">Отправить</button></div>
+        <div class="uploadPercent"></div>
+
+    </form>
+    <div class="error"></div>
+    <div class="header">Загруженные файлы:</div>
+    <div class="uploadedFiles"></div>
+    <script src="javascripts/scripts.js"></script>
+    </body>
+    </html>
