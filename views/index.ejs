@@ -13,11 +13,27 @@
 
     <div id="progress"></div>
 
-    <form id="form" action="/upload" enctype="multipart/form-data" method="POST">
+    <div class="error"></div>
+
+    <form id="form" enctype="multipart/form-data" method="POST">
         <input id="myFile" type="file" name="myFile" />
-        <input type="text" name="description" placeholder="description">
+        <input type="text" name="comment" placeholder="description">
         <input type="submit" value="Upload a file"/>
     </form>
+
+    <h1>List</h1>
+
+    <ul>
+        <% for (let key in files) { %>
+           <li>
+               <%= files[key].originalName %> <br>
+               <%= files[key].comment %> <br>
+               <a download="<%= files[key].originalName %>" href="/files/<%= key %>">Скачать</a>
+               <hr>
+           </li>
+        <% } %>
+    </ul>
+
 
     <script src="script.js"></script>
 </body>

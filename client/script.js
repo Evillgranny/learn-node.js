@@ -1,39 +1,141 @@
 const form = document.querySelector('#form')
-const file = document.querySelector('#myFile')
+const errorWrap = document.querySelector('.error')
+const progressWrap = document.querySelector('#progress')
 
-form.addEventListener('submit', async e => {
-    e.preventDefault()
-    const formdata = new FormData(form)
+const url = 'ws://localhost:5000'
+let ws = null
 
-    fetch('/upload', {
-        method: 'POST',
-        body: formdata
-    })
+form.addEventListener('submit', sendForm)
 
-    const url = 'ws://localhost:5000'
-    let connection = await new WebSocket(url) // это сокет-соединение с сервером
+let reOpenTimer = null
+let keepAliveTimer = null
 
-    connection.onopen = event => {
-        connection.send('hello from client to server!') // можно послать строку, Blob или ArrayBuffer
+let connectionId = null
+let uploadPercent = null
+
+function start (websocketServerLocation) {
+    ws = new WebSocket(websocketServerLocation)
+    ws.onopen =  async function (e) {
+        console.log('соединение установлено')
+        addError({errorInfo:""})
+
+        ws.send('KEEP_ME_ALIVE')
     }
 
-    connection.onmessage =  event => {
-        console.log('клиентом получено сообщение от сервера: ' + event.data) // это сработает, когда сервер пришлёт какое-либо сообщение
-        document.querySelector('#progress').textContent = event.data
-    }
-
-    connection.onerror = error => {
-        console.log('WebSocket error:', error)
-    }
-
-    connection.onclose = () => {
+    ws.onclose = function () {
         console.log("соединение с сервером закрыто")
-        connection = null
+        progressWrap.textContent = 'Файл загржен'
+        ws = null
         clearInterval(keepAliveTimer)
     }
 
-    // чтобы сервер знал, что этот клиент ещё жив, будем регулярно слать ему сообщение "я жив"
-    let keepAliveTimer = setInterval(() => {
-        connection.send('KEEP_ME_ALIVE'); // вот эту строчку бы зашарить с сервером!
-    },5000) // и это число!
-})
+    ws.onmessage = async function (res) {
+
+        const message = JSON.parse(res.data)
+        console.log(message)
+        switch (message.type) {
+            case 'ID':
+                connectionId = message.data
+                const data = new FormData(form)
+                keepAlive()
+                uploadDataService(data)
+                console.log('connectionId', connectionId)
+                reOpenTimer = null
+                break
+            case 'UPLOAD_PERCENT':
+                uploadPercent = message.data
+                progressWrap.textContent = `${uploadPercent}%`
+                break
+            case 'ERROR':
+                addError({errorInfo: message.data})
+                break
+        }
+    }
+
+    ws.onerror = error => {
+        addError({errorInfo:"Сервер недоступен"})
+        progressWrap.textContent = ''
+        setTimeout(() => sendForm() , 5000)
+        clearInterval(keepAliveTimer)
+        console.log('WebSocket error:',error)
+    }
+}
+
+async function uploadDataService (data) {
+    try {
+        const response = await fetch(`/upload`, {
+            method: 'POST',
+            headers:{
+                connectionid: connectionId
+            },
+            body: data
+        })
+
+        const res = await response.json()
+
+        form.reset()
+
+        if (res.error){
+            addError(res.error)
+        }
+    }
+    catch (e) {
+        addError({errorInfo:'Ошибка при загрузке'})
+        if (!reOpenTimer)
+            reOpenTimer = setTimeout(() => sendForm(), 3000)
+        console.error(e)
+    }
+}
+
+function keepAlive () {
+    keepAliveTimer = setInterval(()=>{
+        ws.send('KEEP_ME_ALIVE')
+    },5000)
+}
+
+function addError (error) {
+    errorWrap.textContent = error.errorInfo
+}
+
+async function sendForm(e) {
+    if (e) e.preventDefault()
+    start(url)
+}
+
+async function downloadFile(e) {
+    const body = JSON.stringify({name: e.target.dataset.name});
+    try {
+        const response = await fetch(`${backEndServer}/uploads/${e.target.dataset.name}`, {
+            method: 'GET',
+        } );
+
+        const imageInfoRaw = await fetch(`${backEndServer}/getImageInfo`, {
+            method:'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body
+        })
+
+        const imageInfo = await imageInfoRaw.json();
+
+        if ( response.ok ) {
+            const ab=await response.arrayBuffer();
+
+            const blob = new Blob([ab], { type: imageInfo.mimeType });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = imageInfo.originalName;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        else {
+            console.error('error loading');
+        }
+    }
+    catch ( err ) {
+        console.error(err);
+    }
+}
