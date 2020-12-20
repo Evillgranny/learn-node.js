@@ -82,6 +82,8 @@ setInterval(()=>{
 webserver.use(multer({dest: 'uploads/'}).single("myFile"))
 
 webserver.post('/upload', (req, res) => {
+    if (!req.file) res.status(400).send('No file')
+
     const id = req.headers.connectionid;
 
     fs.readFile(imagesInfoFile, (err, data) => {

@@ -1,4 +1,5 @@
 const form = document.querySelector('#form')
+const file = document.querySelector('#myFile')
 const errorWrap = document.querySelector('.error')
 const progressWrap = document.querySelector('#progress')
 const list = document.querySelector('#list')
@@ -63,6 +64,8 @@ function start (websocketServerLocation) {
 }
 
 async function uploadDataService (data) {
+    if (!file.files.length) return
+
     try {
         const response = await fetch(`/upload`, {
             method: 'POST',
