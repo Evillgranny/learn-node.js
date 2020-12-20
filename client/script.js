@@ -1,6 +1,7 @@
 const form = document.querySelector('#form')
 const errorWrap = document.querySelector('.error')
 const progressWrap = document.querySelector('#progress')
+const list = document.querySelector('#list')
 
 const url = 'ws://localhost:5000'
 let ws = null
@@ -75,6 +76,8 @@ async function uploadDataService (data) {
 
         form.reset()
 
+        await downloadFilesList()
+
         if (res.error){
             addError(res.error)
         }
@@ -102,40 +105,35 @@ async function sendForm(e) {
     start(url)
 }
 
-async function downloadFile(e) {
-    const body = JSON.stringify({name: e.target.dataset.name});
-    try {
-        const response = await fetch(`${backEndServer}/uploads/${e.target.dataset.name}`, {
-            method: 'GET',
-        } );
+async function downloadFilesList () {
+    const response = await fetch(`/files`, {
+        method: 'GET',
+    })
 
-        const imageInfoRaw = await fetch(`${backEndServer}/getImageInfo`, {
-            method:'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body
-        })
+    const res = await response.json()
 
-        const imageInfo = await imageInfoRaw.json();
+    list.innerHTML = ''
 
-        if ( response.ok ) {
-            const ab=await response.arrayBuffer();
+    for (let key in res) {
+        let name = res[key].originalName
+        let comment = res[key].comment
+        let path = key
 
-            const blob = new Blob([ab], { type: imageInfo.mimeType });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.download = imageInfo.originalName;
-            link.href = url;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        else {
-            console.error('error loading');
-        }
-    }
-    catch ( err ) {
-        console.error(err);
+        const item = document.createElement('li')
+        const link = document.createElement('a')
+        const br = document.createElement('br')
+        const br2 = document.createElement('br')
+        const hr = document.createElement('hr')
+        item.append(name)
+        item.append(br)
+        item.append(comment)
+        item.append(br2)
+        link.download = name
+        link.textContent = 'Скачать'
+        link.href = `/files/${path}`
+        item.append(link)
+        item.append(hr)
+
+        list.append(item)
     }
 }

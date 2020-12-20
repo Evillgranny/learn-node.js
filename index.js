@@ -124,6 +124,12 @@ webserver.get('/script.js', (req,res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'script.js'))
 })
 
+webserver.get('/files', (req, res) => {
+    let files = fs.readFileSync(__dirname + '/files.json', 'utf-8')
+    files = JSON.parse(files)
+    res.json(files)
+})
+
 webserver.get('/files/:id', (req, res) => {
     const id = req.params.id
     fs.createReadStream(`${__dirname}/uploads/${id}`).pipe(res)
