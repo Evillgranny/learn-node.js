@@ -7,11 +7,10 @@ const list = document.querySelector('#list')
 const url = 'ws://localhost:5000'
 let ws = null
 
-form.addEventListener('submit', sendForm)
+if (form) form.addEventListener('submit', sendForm)
 
 let reOpenTimer = null
 let keepAliveTimer = null
-
 let connectionId = null
 let uploadPercent = null
 
@@ -32,7 +31,6 @@ function start (websocketServerLocation) {
     }
 
     ws.onmessage = async function (res) {
-
         const message = JSON.parse(res.data)
         console.log(message)
         switch (message.type) {
@@ -109,11 +107,12 @@ async function sendForm(e) {
 }
 
 async function downloadFilesList () {
-    const response = await fetch(`/files`, {
+    const response = await fetch(`/upload/files`, {
         method: 'GET',
     })
 
     const res = await response.json()
+    console.log(res)
 
     list.innerHTML = ''
 
@@ -133,7 +132,7 @@ async function downloadFilesList () {
         item.append(br2)
         link.download = name
         link.textContent = 'Скачать'
-        link.href = `/files/${path}`
+        link.href = `upload/files/${path}`
         item.append(link)
         item.append(hr)
 

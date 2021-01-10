@@ -23,12 +23,17 @@
 
     <h1>List</h1>
 
+    <p>
+        <a href="/logout">Выйти</a>
+    </p>
+
+
     <ul id="list">
         <% for (let key in files) { %>
            <li>
                <%= files[key].originalName %> <br>
                <%= files[key].comment %> <br>
-               <a download="<%= files[key].originalName %>" href="/files/<%= key %>">Скачать</a>
+               <a download="<%= files[key].originalName %>" href="/upload/files/<%= files[key].name %>">Скачать</a>
                <hr>
            </li>
         <% } %>
