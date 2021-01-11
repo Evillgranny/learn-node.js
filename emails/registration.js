@@ -1,7 +1,7 @@
 module.exports = function (email, key) {
     return {
         to: email,
-        from: process.env.EMAIL_FROM,
+        from: 'tractor2554393@yandex.by',
         subject: 'Регистрация',
         html: `
             <h1>Регистрация</h1>

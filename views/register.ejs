@@ -1,5 +1,9 @@
 <h1>Регистрация</h1>
 
+<% if (error) { %>
+    <p style="color: red"><%= error %></p>
+<% } %>
+
 <form action="/register" method="post">
     <input placeholder="email" type="email" name="email">
     <input placeholder="name" type="text" name="name">

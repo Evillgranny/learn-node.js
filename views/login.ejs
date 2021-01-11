@@ -9,6 +9,13 @@
 </head>
 
 <h1>Вход</h1>
+<% if (error) { %>
+    <p style="color: red"><%= error %></p>
+<% } %>
+
+<% if (message) { %>
+    <p style="color: green"><%= message %></p>
+<% } %>
 
 <form action="/login" method="post">
     <input type="email" name="email" placeholder="email">

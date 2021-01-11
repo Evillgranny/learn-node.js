@@ -6,6 +6,7 @@ const FilesModel = require('../models/files')
 const clients = require('../utils/wsClients')
 const progress = require('../middleware/progess')
 const { auth } = require('../middleware/auth')
+const { User } = require(`../models/user`)
 
 router.post('/', progress, auth, async (req, res) => {
     if (!req.file) res.status(400).send('No file')
@@ -34,9 +35,21 @@ router.post('/', progress, auth, async (req, res) => {
 })
 
 router.get('/', auth, async (req, res) => {
-    const files = await FilesModel.find()
-    res.render('upload', {
-        files
+    let token = req.cookies.authToken
+    User.findByToken(token, async (err, user) => {
+        if (err) {
+            return res.render('login', {
+                error: 'У нас что-то сломалось, но не вините себя.',
+                message: false
+            })
+        }
+
+        const name = user.name
+        const files = await FilesModel.find()
+        res.render('upload', {
+            files,
+            name
+        })
     })
 })
 
