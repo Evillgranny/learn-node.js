@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 module.exports = function (email, key) {
     return {
         to: email,

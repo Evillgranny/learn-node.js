@@ -4,7 +4,7 @@ const { User } = require('../models/user')
 const { auth } = require('../middleware/auth')
 const nodemailer = require("nodemailer")
 const regEmail = require('../emails/registration')
-const mailKeys = require('../emails/keys')
+require('dotenv').config()
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.yandex.ru',
@@ -79,6 +79,7 @@ router.post('/register', async (req,res) => {
                 } else {
                     await transporter.sendMail(regEmail(req.body.email, user.key), (err) => {
                         if (err) {
+                            console.log(err)
                             res.render('register', {
                                 error: 'Ошибка отправки сообщения'
                             })
@@ -108,10 +109,7 @@ router.get(`/registration/:key`, async (req, res) => {
         user.status = true
         user.key = ''
         await user.save()
-        res.render('login', {
-            error: false,
-            message: 'Вы успешно зарегистрировались'
-        })
+        res.redirect('/')
     } catch (e) {
         console.log(e)
     }
@@ -123,7 +121,7 @@ router.get('/logout', auth, (req, res) => {
         { token: '' },
         (err) => {
         if (err) return res.json({ success: false, err })
-        return res.status(200).render('login', {
+        return res.render('login', {
             error: false,
             message: false
         })

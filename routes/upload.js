@@ -4,14 +4,16 @@ const fs = require('fs')
 const path = require('path')
 const FilesModel = require('../models/files')
 const clients = require('../utils/wsClients')
-const progress = require('../middleware/progess')
 const { auth } = require('../middleware/auth')
 const { User } = require(`../models/user`)
+const multer = require('multer')
+const upload = multer({dest: 'uploads/'})
+const progressFunc = require('../middleware/progess')
 
-router.post('/', progress, auth, async (req, res) => {
+router.post('/', [auth, progressFunc, upload.single("myFile")], (req, res) => {
     if (!req.file) res.status(400).send('No file')
-    const id = req.headers.connectionid
 
+    const id = req.headers.connectionid
     const imageInfo = req.file
 
     const imagesInfo = {
@@ -24,14 +26,15 @@ router.post('/', progress, auth, async (req, res) => {
     }
 
     const filesModel = new FilesModel(imagesInfo)
-    try {
-        await filesModel.save()
-    } catch (e) {
-        console.log(e)
-    }
 
-    clients[id].connection.terminate()
-    res.json({data: imagesInfo})
+    filesModel.save()
+        .then(() => {
+            clients[id].connection.terminate()
+            res.json({data: imagesInfo})
+        })
+        .catch(e => {
+            console.log(e)
+        })
 })
 
 router.get('/', auth, async (req, res) => {

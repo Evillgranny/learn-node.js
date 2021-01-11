@@ -19,7 +19,6 @@ function start (websocketServerLocation) {
     ws.onopen =  async function (e) {
         console.log('соединение установлено')
         addError({errorInfo:""})
-
         ws.send('KEEP_ME_ALIVE')
     }
 
@@ -116,10 +115,11 @@ async function downloadFilesList () {
 
     list.innerHTML = ''
 
+    console.log('')
     for (let key in res) {
         let name = res[key].originalName
         let comment = res[key].comment
-        let path = key
+        let path = res[key].name
 
         const item = document.createElement('li')
         const link = document.createElement('a')
